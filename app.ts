@@ -17,6 +17,7 @@
 import {ipcRenderer} from 'electron';
 import {AuthFlow, AuthStateEmitter} from './flow';
 import {log} from './logger';
+import * as MD5 from "crypto-js/md5";
 
 const SIGN_IN = 'Sign-In';
 const SIGN_OUT = 'Sign-Out';
@@ -30,9 +31,10 @@ interface SnackBarOptions {
 
 interface UserInfo {
   name: string;
+  email: string;
   given_name: string;
   family_name: string;
-  picture: string;
+  profilePicture: string;
 }
 
 export class App {
@@ -69,7 +71,7 @@ export class App {
     this.fetchUserInfo.addEventListener('click', () => {
       this.authFlow.performWithFreshTokens().then(accessToken => {
         let request =
-            new Request('https://www.googleapis.com/oauth2/v3/userinfo', {
+            new Request('https://pied-piper-dev.onelogin.com/oidc/2/me', {
               headers: new Headers({'Authorization': `Bearer ${accessToken}`}),
               method: 'GET',
               cache: 'no-cache'
@@ -116,7 +118,13 @@ export class App {
     this.handleSignIn.textContent = SIGN_OUT;
     this.fetchUserInfo.style.display = '';
     if (this.userInfo) {
-      this.userProfileImage.src = `${this.userInfo.picture}?sz=96`;
+      if (this.userInfo.profilePicture){
+        this.userProfileImage.src = `${this.userInfo.profilePicture}?sz=96`;
+      } else {
+        // fallback to gravatar
+        let gravatarHash = MD5(this.userInfo.email.toLocaleLowerCase()).toString();
+        this.userProfileImage.src = `https://www.gravatar.com/avatar/${gravatarHash}?sz=96`;
+      }
       this.userName.textContent = this.userInfo.name;
       this.showSnackBar(
           {message: `Welcome ${this.userInfo.name}`, timeout: 4000});

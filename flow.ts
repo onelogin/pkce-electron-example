@@ -13,38 +13,38 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+ import {
+   BaseTokenRequestHandler,
+   TokenRequestHandler
+ } from "@openid/appauth/built/token_request_handler";
 
-import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
+import {
+  GRANT_TYPE_AUTHORIZATION_CODE,
+  GRANT_TYPE_REFRESH_TOKEN,
+  TokenRequest
+} from "@openid/appauth/built/token_request";
+
 import {
   AuthorizationNotifier,
   AuthorizationRequestHandler,
   AuthorizationRequestResponse,
   BUILT_IN_PARAMETERS
 } from "@openid/appauth/built/authorization_request_handler";
+
+import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
 import { AuthorizationResponse } from "@openid/appauth/built/authorization_response";
 import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration";
 import { NodeCrypto } from '@openid/appauth/built/node_support/';
 import { NodeBasedHandler } from "@openid/appauth/built/node_support/node_request_handler";
 import { NodeRequestor } from "@openid/appauth/built/node_support/node_requestor";
-import {
-  GRANT_TYPE_AUTHORIZATION_CODE,
-  GRANT_TYPE_REFRESH_TOKEN,
-  TokenRequest
-} from "@openid/appauth/built/token_request";
-import {
-  BaseTokenRequestHandler,
-  TokenRequestHandler
-} from "@openid/appauth/built/token_request_handler";
-import {
-  TokenError,
-  TokenResponse
-} from "@openid/appauth/built/token_response";
+import { TokenError, TokenResponse } from "@openid/appauth/built/token_response";
+import { StringMap } from "@openid/appauth/built/types";
+
 import EventEmitter = require("events");
 
 import { log } from "./logger";
-import { StringMap } from "@openid/appauth/built/types";
 
-export class AuthStateEmitter extends EventEmitter {
+export class AuthStateEmitter extends EventEmitter.EventEmitter {
   static ON_TOKEN_RESPONSE = "on_token_response";
 }
 
@@ -52,11 +52,10 @@ export class AuthStateEmitter extends EventEmitter {
 const requestor = new NodeRequestor();
 
 /* an example open id connect provider */
-const openIdConnectUrl = "https://accounts.google.com";
+const openIdConnectUrl = "https://your-domain.onelogin.com/oidc/2";
 
 /* example client configuration */
-const clientId =
-  "511828570984-7nmej36h9j2tebiqmpqh835naet4vci4.apps.googleusercontent.com";
+const clientId ="client-00id-id00-client-clientid001";
 const redirectUri = "http://127.0.0.1:8000";
 const scope = "openid";
 
@@ -115,10 +114,12 @@ export class AuthFlow {
       return;
     }
 
-    const extras: StringMap = { prompt: "consent", access_type: "offline" };
-    if (username) {
-      extras["login_hint"] = username;
-    }
+    // Not required for OneLogin with this example
+
+    // const extras: StringMap = { prompt: "consent", access_type: "offline" };
+    // if (username) {
+    //   extras["login_hint"] = username;
+    // }
 
     // create a request
     const request = new AuthorizationRequest({
@@ -127,7 +128,7 @@ export class AuthFlow {
       scope: scope,
       response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
       state: undefined,
-      extras: extras
+      // extras: extras // Not required for OneLogin with this example
     }, new NodeCrypto());
 
     log("Making authorization request ", this.configuration, request);

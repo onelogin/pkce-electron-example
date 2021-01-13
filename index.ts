@@ -25,7 +25,7 @@ let w: Electron.BrowserWindow|null = null;
 function createWindow(): Electron.BrowserWindow {
   log('Creating window.');
   w = new BrowserWindow(
-      {width: 1280, height: 720, icon: 'assets/app_icon.png'});
+      {width: 800, height: 800, icon: 'assets/app_icon.png', webPreferences: { nodeIntegration: true }});
   w.loadURL(url.format({
     pathname: path.join(path.dirname(__dirname), 'index.html'),
     protocol: 'file:',
