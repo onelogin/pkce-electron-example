@@ -23,6 +23,7 @@ resource onelogin_users username {
 	lastname = "name"
 	firstname = "user"
 	username = "user.name"
+  password = "1234"
 }
 
 resource onelogin_roles oidc_app_role {
